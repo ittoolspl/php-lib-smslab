@@ -1,0 +1,35 @@
+{
+  "name": "ittoolspl/php-lib-smslabs",
+  "description": "PHP client for SMSLabs.pl",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "ITTools",
+      "email": "kontakt@ittools.pl"
+    }
+  ],
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "Ittoolspl\\Smslabs\\": "src/",
+      "Ittoolspl\\Smslabs\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": "^7.0",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "require-dev": {
+    "pdepend/pdepend": "^2.5",
+    "phing/phing": "^2.16",
+    "phploc/phploc": "^4.0",
+    "phpmd/phpmd": "^2.6",
+    "sebastian/phpcpd": "^4.1",
+    "squizlabs/php_codesniffer": "^3.3",
+    "phpunit/phpunit": "^7.4",
+    "mockery/mockery": "^1.2",
+    "infection/infection": "^0.11.2"
+  }
+}

@@ -1,0 +1,54 @@
+filter:
+    excluded_paths: [tests/*]
+checks:
+    php:
+        code_rating: true
+        remove_extra_empty_lines: true
+        remove_php_closing_tag: true
+        remove_trailing_whitespace: true
+        fix_use_statements:
+            remove_unused: true
+            preserve_multiple: false
+            preserve_blanklines: true
+            order_alphabetically: true
+        fix_php_opening_tag: true
+        fix_linefeed: true
+        fix_line_ending: true
+        fix_identation_4spaces: true
+        fix_doc_comments: true
+        uppercase_constants: true
+        simplify_boolean_return: true
+        return_doc_comments: true
+        properties_in_camelcaps: true
+        check_method_contracts:
+            verify_interface_like_constraints: true
+            verify_documented_constraints: true
+            verify_parent_constraints: true
+        avoid_todo_comments: true
+        avoid_unnecessary_concatenation: true
+        avoid_multiple_statements_on_same_line: true
+        avoid_fixme_comments: true
+        no_long_variable_names:
+            maximum: '20'
+        no_goto: true
+        newline_at_end_of_file: true
+        more_specific_types_in_doc_comments: true
+        line_length:
+            max_length: '120'
+        function_in_camel_caps: true
+        excluded_dependencies:
+          - atoum/atoum
+
+tools:
+    external_code_coverage: true
+    php_mess_detector: true
+    php_code_sniffer: true
+    sensiolabs_security_checker: true
+    php_code_coverage: true
+    php_pdepend: true
+    php_loc:
+        enabled: true
+        excluded_dirs: [vendor, tests]
+    php_cpd:
+        enabled: true
+        excluded_dirs: [vendor, tests]

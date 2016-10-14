@@ -1,0 +1,31 @@
+language:
+  php
+
+php:
+  - '7.0'
+  - '7.1'
+  - '7.2'
+  - nightly
+
+before_install:
+
+install:
+  - composer self-update
+  - composer install
+
+before_script:
+
+script:
+  - vendor/bin/phpunit --configuration phpunit.xml --colors --coverage-text --coverage-clover=coverage.clover
+  - vendor/bin/phpcs --standard=PSR2 src
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
+after_success:
+
+after_failure:
+
+notifications:
+  email: false

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="php-lib-smslab" basedir="." default="main">
+
+    <property name="builddir" value="build"/>
+    <property name="source" value="src"/>
+    <property name="testdir" value="tests"/>
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT) Target: main                        -->
+    <!-- ============================================  -->
+    <target name="main" description="Start analyzing our application">
+        <echo msg="Start Build"/>
+
+        <phingcall target="prepare-dirs"/>
+        <phingcall target="composer"/>
+        <phingcall target="phpunit"/>
+        <phingcall target="infection"/>
+        <phingcall target="pdepend"/>
+        <phingcall target="phpmd"/>
+        <phingcall target="phpcpd"/>
+        <phingcall target="phpdoc"/>
+        <phingcall target="phpcs"/>
+        <phingcall target="phploc"/>
+        <!--<phingcall target="phpcb"/>-->
+
+        <echo msg="Finished Build"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT) Target: prepare                     -->
+    <!-- ============================================  -->
+    <target name="prepare-dirs">
+        <echo msg="Making directory build"/>
+
+        <delete dir="${builddir}" includeemptydirs="true" verbose="false"/>
+        <delete dir="vendor" includeemptydirs="true" verbose="false"/>
+
+        <mkdir dir="${builddir}"/>
+        <mkdir dir="${builddir}/api"/>
+        <mkdir dir="${builddir}/code-browser"/>
+        <mkdir dir="${builddir}/coverage"/>
+        <mkdir dir="${builddir}/docs"/>
+        <mkdir dir="${builddir}/logs"/>
+        <mkdir dir="${builddir}/pdepend"/>
+    </target>
+
+
+    <!-- ============================================  -->
+    <!-- Target: Composer download, install, update    -->
+    <!-- ============================================  -->
+    <target name="composer">
+        <exec command="composer install" passthru="true"/>
+        <exec command="composer dump-autoload --optimize" passthru="true"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: Unit test                             -->
+    <!-- ============================================  -->
+    <target name="phpunit" description="Run unit tests using PHPUnit and generates junit.xml and clover.xml">
+        <echo msg="Beginning of the tests"/>
+        <exec command="./vendor/bin/phpunit ${testdir}"
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: Infection                             -->
+    <!-- ============================================  -->
+    <target name="infection" description="Run mutation tests">
+        <echo msg="Beginning of the mutation tests"/>
+        <exec command="./vendor/infection/infection/bin/infection"
+        />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHP Depend                            -->
+    <!-- ============================================  -->
+    <target name="pdepend" description="Calculate dependencies of the code base">
+        <exec command="./vendor/bin/pdepend --jdepend-xml=${builddir}/logs/jdepend.xml
+                               --jdepend-chart=${builddir}/pdepend/dependencies.svg
+                               --overview-pyramid=${builddir}/pdepend/overview-pyramid.svg
+                               --suffix=php
+                               ${source}"
+              escape="false"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPMD (Project Mess Detector)         -->
+    <!-- ============================================  -->
+    <target name="phpmd" description="Generate pmd.xml using PHPMD">
+        <phpmd rulesets="codesize,design,naming,unusedcode">
+            <fileset dir="src/"/>
+            <formatter type="xml" outfile="${builddir}/logs/pmd.xml"/>
+        </phpmd>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPCPD (Copy/Paste Detector)          -->
+    <!-- ============================================  -->
+    <target name="phpcpd" description="Copy/Paste Detection">
+        <phpcpd>
+            <fileset dir="src/"/>
+            <formatter type="pmd" outfile="${builddir}/logs/pmd-cpd.xml"/>
+        </phpcpd>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPCS (PHP Code Sniffer)              -->
+    <!-- ============================================  -->
+    <target name="phpcs" description="Coding Standards Analysis">
+        <exec command="./vendor/bin/phpcs
+                             --report=checkstyle
+                             --report-file=${builddir}/logs/checkstyle.xml
+                             --ignore=build,vendor
+                             --extensions=php
+                             ${source}"
+              escape="false"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPDoc                                -->
+    <!-- ============================================  -->
+    <target name="phpdoc" description="Generate API documentation using PHPDocumentor">
+        <exec command="wget -O ./build/phpDocumentor.phar https://github.com/phpDocumentor/phpDocumentor2/releases/download/v3.0.0-alpha.3/phpDocumentor.phar"/>
+        <exec command="wget -O ./build/phpDocumentor.phar.pubkey https://github.com/phpDocumentor/phpDocumentor2/releases/download/v3.0.0-alpha.3/phpDocumentor.phar.pubkey"/>
+
+        <chmod file="./build/phpDocumentor.phar" mode="0755" />
+
+        <exec command="./build/phpDocumentor.phar -d ./src/ -t ./build/docs"/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPLoc (PHP Lines of Code)              -->
+    <!-- ============================================  -->
+    <target name="phploc" description="Generate phploc.csv">
+        <exec command="./vendor/bin/phploc --log-csv ${builddir}/logs/phploc.csv ${source} "/>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: PHPCB (PHP Code Browser)              -->
+    <!-- ============================================  -->
+    <target name="phpcb" description="Aggregate tool output with PHP_CodeBrowser">
+        <exec command="./vendor/bin/phpcb --log ${builddir}/logs
+              --source src/
+              --output ${builddir}/code-browser"/>
+    </target>
+
+</project>
